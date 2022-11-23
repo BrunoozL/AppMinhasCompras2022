@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration;
 using Xamarin.Forms.Xaml;
 
 namespace AppMinhasCompras2022
@@ -30,7 +31,6 @@ namespace AppMinhasCompras2022
         public App()
         {
             InitializeComponent();
-
             MainPage = new NavigationPage(new View.Listagem());
         }
 

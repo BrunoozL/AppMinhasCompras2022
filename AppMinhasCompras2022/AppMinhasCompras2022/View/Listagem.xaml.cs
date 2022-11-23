@@ -38,7 +38,7 @@ namespace AppMinhasCompras2022.View
             try
             {
                 double soma = lista_produtos.Sum(i => i.preco * i.quantidade);
-                string msg = "O total da compra é:" + soma;
+                DisplayAlert("Total da compra é", soma.ToString("C"), "OK");
             }
             catch (Exception ex)
             {
@@ -85,24 +85,26 @@ namespace AppMinhasCompras2022.View
         {
             string buscou = e.NewTextValue;
 
-            System.Threading.Tasks.Task.Run(async () =>
+            lista_produtos.Clear();
+
+            Task.Run(async () =>
             {
                 List<Produto> temp = await App.Database.Search(buscou);
 
-                lista_produtos.Clear();
-
-                foreach (Produto item in temp)
+                foreach (Produto p in temp)
                 {
-                    lista_produtos.Add(item);
+                    lista_produtos.Add(p);
                 }
-
-                ref_carregando.IsRefreshing = false;
             });
         }
 
         private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
 
+            Navigation.PushAsync(new EditarProduto
+            {
+                BindingContext = (Produto)e.SelectedItem
+            });
         }
     }
 }

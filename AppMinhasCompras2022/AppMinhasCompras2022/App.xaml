@@ -3,6 +3,5 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AppMinhasCompras2022.App">
     <Application.Resources>
-
     </Application.Resources>
 </Application>
