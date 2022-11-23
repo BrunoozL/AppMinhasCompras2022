@@ -14,6 +14,8 @@ namespace AppMinhasCompras2022.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Listagem : ContentPage
     {
+        ObservableCollection<Produto> lista_produtos = new ObservableCollection<Produto>();
+
         public Listagem()
         {
             InitializeComponent();
@@ -33,16 +35,61 @@ namespace AppMinhasCompras2022.View
 
         private void ToolbarItem_Clicked_Somar(object sender, EventArgs e)
         {
-
+            try
+            {
+                double soma = lista_produtos.Sum(i => i.preco * i.quantidade);
+                string msg = "O total da compra é:" + soma;
+            }
+            catch (Exception ex)
+            {
+                DisplayAlert("Ops", ex.Message, "OK");
+            }
         }
 
         protected override void OnAppearing()
         {
-            ObservableCollection<Produto> lista_produtos = new ObservableCollection<Produto>();
+            if (lista_produtos.Count == 0)
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    List<Produto> temp = await App.Database.GetAll();
+
+                    foreach (Produto item in temp)
+                    {
+                        lista_produtos.Add(item);
+                    }
+
+                    ref_carregando.IsRefreshing = false;
+                });
+
+                lst_produtos.ItemsSource = lista_produtos;
+            }
+        }
+
+        private async void MenuItem_Clicked(object sender, EventArgs e)
+        {
+            MenuItem disparador = (MenuItem)sender;
+
+            Produto produto_selecionado = (Produto)disparador.BindingContext;
+
+            bool confirmacao = await DisplayAlert("Tem certeza?", "Remover item?", "Sim", "Não");
+
+            if(confirmacao)
+            {
+                await App.Database.Delete(produto_selecionado.id);
+                lista_produtos.Remove(produto_selecionado);
+            }
+        }
+
+        private void txt_buscar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string buscou = e.NewTextValue;
 
             System.Threading.Tasks.Task.Run(async () =>
             {
-                List<Produto> temp = await App.Database.GetAll();
+                List<Produto> temp = await App.Database.Search(buscou);
+
+                lista_produtos.Clear();
 
                 foreach (Produto item in temp)
                 {
@@ -51,8 +98,11 @@ namespace AppMinhasCompras2022.View
 
                 ref_carregando.IsRefreshing = false;
             });
+        }
 
-            lst_produtos.ItemsSource = lista_produtos;
+        private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+
         }
     }
 }

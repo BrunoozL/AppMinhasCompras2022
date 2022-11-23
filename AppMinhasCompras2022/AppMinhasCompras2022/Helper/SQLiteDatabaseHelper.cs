@@ -37,5 +37,12 @@ namespace AppMinhasCompras2022.Helper
         {
             return _conn.Table<Produto>().DeleteAsync(i => i.id == id);
         }
+
+        public Task<List<Produto>> Search(string q)
+        {
+            string sql = "SELECT * FROM produto WHERE descricao LIKE %" + q + "%";
+
+            return _conn.QueryAsync<Produto>(sql);
+        }
     }
 }
